@@ -23,6 +23,7 @@ interface ContentItem {
   body: string
   date?: string
   media?: string
+  tags?: string[]
 }
 
 const mockData: ContentItem[] = [
@@ -30,19 +31,22 @@ const mockData: ContentItem[] = [
     id: "1",
     section: "hero",
     page: "home",
-    title: "Hi, I'm Harsh",
-    subtitle: "Crafting Data, Design & Decision",
-    body: "A passionate data scientist and AI strategist building impactful digital ecosystems.",
-    media: "/hero-image.png"
+    title: "Harsh Mehta",
+    subtitle: "Founder & data scientist turning raw data into packed venues.",
+    body:
+      "Building Ensemble, the AI-agent booking engine. Business, Intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live audio engineer, cinephile, spiritually Sanatan Hindu and history buff, INTP hoarding datasets on a self-built NAS while tinkering with MCP and next-gen agents. If it sounds niche or scaleless — I’m in.",
+    media: "/hero.png",
+    tags: ["AI", "Agent-based Architecture", "Strategy"]
   },
   {
     id: "2",
-    section: "experience",
+    section: "about",
     page: "about",
-    title: "HP Tech Ventures",
-    body: "Analyzed startup investments using Snowflake & Python",
-    date: "Jul 2024 - Aug 2024",
-    media: "/hp-exp.jpg"
+    title: "About Me",
+    subtitle: "Data science, storytelling, and disciplined iteration.",
+    body:
+      "I am Harsh Mehta, a data scientist, founder, and builder focused on mastering AI through code, systems design, and disciplined iteration. I build intelligent automation, machine learning products, and data infrastructure that solve real business problems. My work at Ensemble AI, HP Tech Ventures, and Beats by Dre reflects a balance of technical depth and strategic execution.\n\nBeyond data, I explore music visualizations, cinema, cultural patterns, and creative systems. I help solopreneurs and small teams scale faster through automation and sharp problem solving.",
+    media: ""
   }
 ]
 
@@ -155,7 +159,8 @@ export default function AdminContentManager() {
                 subtitle: formData.get("subtitle") as string,
                 body: formData.get("body") as string,
                 date: formData.get("date") as string,
-                media: preview || editingItem?.media || ""
+                media: preview || editingItem?.media || "",
+                tags: (formData.get("tags") as string)?.split(",").map(t => t.trim()) || []
               }
               handleSave(newItem)
             }}
@@ -180,6 +185,10 @@ export default function AdminContentManager() {
             <div>
               <Label htmlFor="body">Markdown Body</Label>
               <Textarea name="body" defaultValue={editingItem?.body || ""} rows={6} required />
+            </div>
+            <div>
+              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Input name="tags" defaultValue={editingItem?.tags?.join(", ") || ""} />
             </div>
             <div>
               <Label htmlFor="date">Date (optional)</Label>

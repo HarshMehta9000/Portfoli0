@@ -31,12 +31,13 @@ export default function ExperienceCardEnhanced({ experience, index }: Experience
         onMouseLeave={() => setIsHovered(false)}
       >
         <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
-          <div className="relative aspect-video overflow-hidden">
+          <div className="relative aspect-video overflow-hidden bg-background">
             <Image
               src={experience.coverImage || "/placeholder.svg"}
               alt={experience.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-contain transition-transform duration-500"
+              style={{ maxHeight: "100%", objectPosition: "center" }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
               <div className="flex gap-2">
@@ -88,12 +89,13 @@ export default function ExperienceCardEnhanced({ experience, index }: Experience
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
-            <div className="relative aspect-video overflow-hidden rounded-lg">
+            <div className="relative aspect-video overflow-hidden rounded-lg bg-background">
               <Image
                 src={experience.coverImage || "/placeholder.svg"}
                 alt={experience.title}
                 fill
-                className="object-cover"
+                className="object-contain"
+                style={{ objectPosition: "center" }}
               />
             </div>
             <div className="flex flex-wrap gap-2 my-2">

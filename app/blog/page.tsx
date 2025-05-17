@@ -1,3 +1,5 @@
+// app/blog/page.tsx (Enhanced CMS-Compatible Blog Page)
+
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -13,7 +15,12 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  const blogPosts = await getAllBlogPosts()
+  let blogPosts = []
+  try {
+    blogPosts = await getAllBlogPosts()
+  } catch (e) {
+    console.error("Failed to load blog posts:", e)
+  }
 
   const allTags = Array.from(new Set(blogPosts.flatMap((post) => post.tags)))
 

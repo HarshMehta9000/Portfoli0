@@ -56,19 +56,15 @@ export default function EnhancedImageUploader({
     (acceptedFiles: File[]) => {
       setError(null)
 
-      if (acceptedFiles.length === 0) {
-        return
-      }
+      if (acceptedFiles.length === 0) return
 
       const selectedFile = acceptedFiles[0]
 
-      // Check file type
       if (!allowedTypes.includes(selectedFile.type)) {
         setError(`File type not allowed. Please upload: ${allowedTypes.join(", ")}`)
         return
       }
 
-      // Check file size
       if (selectedFile.size > maxSizeMB * 1024 * 1024) {
         setError(`File too large. Maximum size: ${maxSizeMB}MB`)
         return
@@ -76,17 +72,14 @@ export default function EnhancedImageUploader({
 
       setFile(selectedFile)
 
-      // Create preview
       const reader = new FileReader()
       reader.onload = () => {
         setPreview(reader.result as string)
       }
       reader.readAsDataURL(selectedFile)
 
-      // Auto-generate title from filename if empty
       if (!title) {
         const fileName = selectedFile.name.split(".")[0]
-        // Convert filename to title case with spaces
         const formattedTitle = fileName
           .replace(/[-_]/g, " ")
           .replace(/([a-z])([A-Z])/g, "$1 $2")
@@ -99,20 +92,14 @@ export default function EnhancedImageUploader({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": allowedTypes,
-    },
+    accept: { "image/*": allowedTypes },
     maxFiles: 1,
   })
 
   const simulateProgress = () => {
     setUploadProgress(0)
     progressIntervalRef.current = setInterval(() => {
-      setUploadProgress((prev) => {
-        const increment = Math.random() * 10
-        const newProgress = Math.min(prev + increment, 95)
-        return newProgress
-      })
+      setUploadProgress((prev) => Math.min(prev + Math.random() * 10, 95))
     }, 300)
   }
 
@@ -142,19 +129,13 @@ export default function EnhancedImageUploader({
       })
 
       const result = await response.json()
+      if (!response.ok) throw new Error(result.error || "Failed to upload image")
 
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to upload image")
-      }
-
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current)
-      }
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
 
       setUploadProgress(100)
       setIsSuccess(true)
 
-      // Call the callback with the uploaded image data
       if (onUploadComplete) {
         onUploadComplete({
           url: result.url,
@@ -165,12 +146,8 @@ export default function EnhancedImageUploader({
         })
       }
 
-      toast({
-        title: "Image uploaded successfully",
-        description: "Your image has been uploaded and optimized.",
-      })
+      toast({ title: "Image uploaded successfully", description: "Your image has been uploaded and optimized." })
 
-      // Reset form after 2 seconds
       setTimeout(() => {
         setTitle("")
         setDescription("")
@@ -181,13 +158,9 @@ export default function EnhancedImageUploader({
         setUploadProgress(0)
       }, 2000)
     } catch (err) {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current)
-      }
-
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setUploadProgress(0)
-
       toast({
         title: "Upload failed",
         description: err instanceof Error ? err.message : "An unknown error occurred",
@@ -211,15 +184,20 @@ export default function EnhancedImageUploader({
               isDragActive
                 ? "border-primary bg-primary/10"
                 : preview
-                  ? "border-green-500 bg-green-50 dark:bg-green-950/20"
-                  : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                : "border-muted-foreground/25 hover:border-muted-foreground/50"
             }`}
           >
             <input {...getInputProps()} />
 
             {preview ? (
-              <div className="relative aspect-video rounded-md overflow-hidden">
-                <img src={preview || "/placeholder.svg"} alt="Preview" className="object-cover w-full h-full" />
+              <div className="relative w-full h-60 rounded-md overflow-hidden bg-background/10 border border-dashed border-muted">
+                <img
+                  src={preview || "/placeholder.svg"}
+                  alt="Preview"
+                  className="object-contain w-full h-full"
+                  style={{ objectPosition: "center" }}
+                />
                 <Button
                   type="button"
                   variant="destructive"
@@ -290,9 +268,7 @@ export default function EnhancedImageUploader({
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat.toLowerCase().replace(/\s+/g, "-")}>
-                        {cat}
-                      </SelectItem>
+                      <SelectItem key={cat} value={cat.toLowerCase().replace(/\s+/g, "-")}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -350,9 +326,7 @@ export default function EnhancedImageUploader({
                 </div>
 
                 <div className="flex items-center justify-between space-x-2">
-                  <Label htmlFor="thumbnail" className="flex-grow">
-                    Generate thumbnail
-                  </Label>
+                  <Label htmlFor="thumbnail" className="flex-grow">Generate thumbnail</Label>
                   <Switch
                     id="thumbnail"
                     checked={generateThumbnail}
@@ -386,18 +360,15 @@ export default function EnhancedImageUploader({
         <Button type="submit" className="w-full" disabled={isUploading || !file || !title} onClick={handleSubmit}>
           {isUploading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Uploading...
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...
             </>
           ) : isSuccess ? (
             <>
-              <Check className="mr-2 h-4 w-4" />
-              Uploaded Successfully
+              <Check className="mr-2 h-4 w-4" /> Uploaded Successfully
             </>
           ) : (
             <>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Image
+              <Upload className="mr-2 h-4 w-4" /> Upload Image
             </>
           )}
         </Button>

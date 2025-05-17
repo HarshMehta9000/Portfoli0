@@ -17,28 +17,32 @@ import ReactMarkdown from "react-markdown"
 interface ContentItem {
   id: string
   section: string
+  page: string
   title: string
+  subtitle?: string
   body: string
-  date: string
+  date?: string
   media?: string
 }
 
 const mockData: ContentItem[] = [
   {
     id: "1",
-    section: "experience",
-    title: "HP Tech Ventures",
-    body: "Analyzed startup investments using Snowflake & Python",
-    date: "Jul 2024 - Aug 2024",
-    media: "https://example.com/media1.jpg"
+    section: "hero",
+    page: "home",
+    title: "Hi, I'm Harsh",
+    subtitle: "Crafting Data, Design & Decision",
+    body: "A passionate data scientist and AI strategist building impactful digital ecosystems.",
+    media: "/hero-image.png"
   },
   {
     id: "2",
-    section: "project",
-    title: "Ensemble AI",
-    body: "Automated venue booking via AI agents",
-    date: "Feb 2025 - Present",
-    media: "https://example.com/media2.jpg"
+    section: "experience",
+    page: "about",
+    title: "HP Tech Ventures",
+    body: "Analyzed startup investments using Snowflake & Python",
+    date: "Jul 2024 - Aug 2024",
+    media: "/hp-exp.jpg"
   }
 ]
 
@@ -46,7 +50,7 @@ export default function AdminContentManager() {
   const [data, setData] = useState<ContentItem[]>(mockData)
   const [open, setOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null)
-  const [sortKey, setSortKey] = useState<string>("section")
+  const [sortKey, setSortKey] = useState<string>("page")
   const [preview, setPreview] = useState<string | null>(null)
 
   const handleSave = (item: ContentItem) => {
@@ -88,21 +92,21 @@ export default function AdminContentManager() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold">Admin Content Manager</h1>
+        <h1 className="text-3xl font-bold">Site Content Editor</h1>
       </div>
 
       <div className="mb-4 flex justify-between items-center">
         <Button onClick={() => setOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Entry
+          <PlusCircle className="mr-2 h-4 w-4" /> Add New Block
         </Button>
         <Select value={sortKey} onValueChange={setSortKey}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="page">Page</SelectItem>
             <SelectItem value="section">Section</SelectItem>
             <SelectItem value="title">Title</SelectItem>
-            <SelectItem value="date">Date</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,13 +116,12 @@ export default function AdminContentManager() {
           <Card key={item.id}>
             <CardHeader>
               <CardTitle>{item.title}</CardTitle>
-              <p className="text-sm text-muted-foreground">{item.date}</p>
+              <p className="text-xs text-muted-foreground">{item.page} • {item.section}</p>
             </CardHeader>
             <CardContent>
+              {item.subtitle && <p className="text-sm italic text-muted-foreground mb-2">{item.subtitle}</p>}
               <ReactMarkdown className="prose dark:prose-invert text-sm mb-2">{item.body}</ReactMarkdown>
-              {item.media && (
-                <img src={item.media} alt="Media" className="rounded w-full object-contain h-40" />
-              )}
+              {item.media && <img src={item.media} alt="Media" className="rounded w-full object-contain h-40" />}
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={() => { setEditingItem(item); setOpen(true); setPreview(item.media || null) }}>
@@ -135,8 +138,8 @@ export default function AdminContentManager() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingItem ? "Edit Content" : "Add Content"}</DialogTitle>
-            <DialogDescription>Fill in the details and click save.</DialogDescription>
+            <DialogTitle>{editingItem ? "Edit Content Block" : "Add Content Block"}</DialogTitle>
+            <DialogDescription>Manage any section on any page from one place.</DialogDescription>
           </DialogHeader>
 
           <form
@@ -146,8 +149,10 @@ export default function AdminContentManager() {
               const formData = new FormData(form)
               const newItem: ContentItem = {
                 id: editingItem?.id || "",
+                page: formData.get("page") as string,
                 section: formData.get("section") as string,
                 title: formData.get("title") as string,
+                subtitle: formData.get("subtitle") as string,
                 body: formData.get("body") as string,
                 date: formData.get("date") as string,
                 media: preview || editingItem?.media || ""
@@ -157,6 +162,10 @@ export default function AdminContentManager() {
             className="space-y-4"
           >
             <div>
+              <Label htmlFor="page">Page</Label>
+              <Input name="page" defaultValue={editingItem?.page || ""} required />
+            </div>
+            <div>
               <Label htmlFor="section">Section</Label>
               <Input name="section" defaultValue={editingItem?.section || ""} required />
             </div>
@@ -165,25 +174,29 @@ export default function AdminContentManager() {
               <Input name="title" defaultValue={editingItem?.title || ""} required />
             </div>
             <div>
-              <Label htmlFor="body">Markdown Description</Label>
+              <Label htmlFor="subtitle">Subtitle</Label>
+              <Input name="subtitle" defaultValue={editingItem?.subtitle || ""} />
+            </div>
+            <div>
+              <Label htmlFor="body">Markdown Body</Label>
               <Textarea name="body" defaultValue={editingItem?.body || ""} rows={6} required />
             </div>
             <div>
-              <Label htmlFor="date">Date</Label>
-              <Input name="date" defaultValue={editingItem?.date || ""} required />
+              <Label htmlFor="date">Date (optional)</Label>
+              <Input name="date" defaultValue={editingItem?.date || ""} />
             </div>
             <div>
-              <Label>Drag & Drop Image</Label>
+              <Label>Drag & Drop Media</Label>
               <div {...getRootProps()} className="border-dashed border rounded p-4 cursor-pointer text-sm text-muted-foreground">
                 <input {...getInputProps()} />
                 {preview ? (
                   <img src={preview} alt="Preview" className="mt-2 max-h-48 mx-auto rounded object-contain" />
                 ) : (
-                  <div className="flex items-center justify-center gap-2"><Upload className="h-4 w-4" /> Drop image or click to upload</div>
+                  <div className="flex items-center justify-center gap-2"><Upload className="h-4 w-4" /> Drop or click to upload image</div>
                 )}
               </div>
             </div>
-            <Button type="submit" className="w-full">Save</Button>
+            <Button type="submit" className="w-full">Save Block</Button>
           </form>
         </DialogContent>
       </Dialog>

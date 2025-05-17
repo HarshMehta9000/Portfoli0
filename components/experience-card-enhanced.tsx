@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
+// import Image from "next/image" // Image disabled
 import { ArrowUpRight, Calendar, MapPin, ExternalLink } from "lucide-react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -31,24 +31,7 @@ export default function ExperienceCardEnhanced({ experience, index }: Experience
         onMouseLeave={() => setIsHovered(false)}
       >
         <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col">
-          <div className="relative w-full h-60 overflow-hidden bg-background">
-            <Image
-              src={experience.coverImage || "/placeholder.svg"}
-              alt={experience.title}
-              fill
-              className="object-contain"
-              style={{ objectPosition: "center" }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <div className="flex gap-2">
-                {experience.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="font-normal">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* Image section removed */}
           <CardContent className="p-6 flex-grow">
             <div className="flex flex-col space-y-2 mb-3">
               <div className="flex items-center text-sm text-muted-foreground space-x-2">
@@ -89,15 +72,7 @@ export default function ExperienceCardEnhanced({ experience, index }: Experience
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
-            <div className="relative w-full h-60 overflow-hidden rounded-lg bg-background">
-              <Image
-                src={experience.coverImage || "/placeholder.svg"}
-                alt={experience.title}
-                fill
-                className="object-contain"
-                style={{ objectPosition: "center" }}
-              />
-            </div>
+            {/* Modal image preview removed */}
             <div className="flex flex-wrap gap-2 my-2">
               {experience.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="font-normal">

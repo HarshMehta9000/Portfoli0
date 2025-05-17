@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { blogPosts } from "@/lib/blog-posts"
+import { getAllBlogPosts } from "@/lib/blog-posts"
 import SectionAnimation from "@/components/section-animation"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,8 +12,9 @@ export const metadata: Metadata = {
   description: "Thoughts, insights, and explorations on data science, AI, and technology",
 }
 
-export default function BlogPage() {
-  // Extract all unique tags from blog posts
+export default async function BlogPage() {
+  const blogPosts = await getAllBlogPosts()
+
   const allTags = Array.from(new Set(blogPosts.flatMap((post) => post.tags)))
 
   return (
@@ -38,7 +39,7 @@ export default function BlogPage() {
               type="search"
               placeholder="Search articles..."
               className="max-w-sm"
-              // In a real app, this would be connected to a search function
+              disabled // To be integrated with search filtering later
             />
           </div>
         </div>
@@ -50,7 +51,7 @@ export default function BlogPage() {
             <TabsTrigger value="all" className="flex-1">
               All
             </TabsTrigger>
-            {allTags.slice(0, 4).map((tag) => (
+            {allTags.slice(0, 6).map((tag) => (
               <TabsTrigger key={tag} value={tag} className="flex-1">
                 {tag}
               </TabsTrigger>
@@ -91,7 +92,7 @@ export default function BlogPage() {
             </div>
           </TabsContent>
 
-          {allTags.slice(0, 4).map((tag) => (
+          {allTags.slice(0, 6).map((tag) => (
             <TabsContent key={tag} value={tag} className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {blogPosts

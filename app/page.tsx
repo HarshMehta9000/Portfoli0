@@ -4,7 +4,7 @@ import EnhancedThreeScene from "@/components/enhanced-three-scene"
 import VisitorCounterEnhanced from "@/components/visitor-counter-enhanced"
 import ContactForm from "@/components/contact-form"
 import { skills } from "@/lib/skills"
-import { blogPosts } from "@/lib/blog-posts"
+import { getAllBlogPosts } from "@/lib/blog-posts"
 import { experiences } from "@/lib/experiences"
 import { galleryImages } from "@/lib/gallery-images"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,6 @@ import SkillCardEnhanced from "@/components/skill-card-enhanced"
 import GalleryGridEnhanced from "@/components/gallery-grid-enhanced"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Moved metadata to a separate export to avoid syntax issues
 export const metadata = {
   title: "Harsh Mehta | Data Scientist & Founder",
   description:
@@ -44,7 +43,6 @@ export const metadata = {
   },
 }
 
-// Mock projects data
 const projects = [
   {
     title: "UW Transportation Services Campus Parking Efficiency Project",
@@ -105,10 +103,12 @@ const projects = [
   },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const blogPosts = await getAllBlogPosts()
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section with Enhanced Three.js Animation */}
+      {/* Hero Section */}
       <section className="relative h-[90vh] w-full overflow-hidden">
         <EnhancedThreeScene intensity={1.2} particleCount={3000} particleSize={0.02} speed={0.3} interactive={true} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 z-10">
@@ -138,9 +138,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section with Education - WITH PARTICLES */}
+      {/* About Section */}
       <SectionAnimation id="about" animation="fade" className="bg-muted/50 py-24 relative overflow-hidden">
-        {/* Add the particle background */}
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
             colorScheme="blue"
@@ -150,7 +149,6 @@ export default function Home() {
             interactive={false}
           />
         </div>
-
         <div className="container relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <SectionAnimation animation="slide-right" delay={0.2}>
@@ -214,9 +212,8 @@ export default function Home() {
         </div>
       </SectionAnimation>
 
-      {/* Experience Section - WITH PARTICLES */}
+      {/* Experience Section */}
       <SectionAnimation id="work" animation="fade" className="py-24 relative overflow-hidden">
-        {/* Add the particle background */}
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
             colorScheme="purple"
@@ -226,7 +223,6 @@ export default function Home() {
             interactive={false}
           />
         </div>
-
         <div className="container relative z-10">
           <div className="flex flex-col items-center mb-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text">Experience</h2>
@@ -235,7 +231,6 @@ export default function Home() {
               cloud technologies (AWS, Python, SQL) to uncover strategic insights and tackle complex business problems.
             </p>
           </div>
-
           <Tabs defaultValue="cards" className="w-full mb-8">
             <div className="flex justify-center">
               <TabsList>
@@ -243,7 +238,6 @@ export default function Home() {
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
               </TabsList>
             </div>
-
             <TabsContent value="cards" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {experiences.slice(0, 6).map((experience, index) => (
@@ -251,7 +245,6 @@ export default function Home() {
                 ))}
               </div>
             </TabsContent>
-
             <TabsContent value="timeline" className="mt-6">
               <div className="relative border-l-2 border-muted ml-4 md:ml-6 pl-6 md:pl-8 space-y-10">
                 {experiences.slice(0, 6).map((experience, index) => (
@@ -284,9 +277,8 @@ export default function Home() {
         </div>
       </SectionAnimation>
 
-      {/* Projects Section - WITH PARTICLES */}
+      {/* Projects Section */}
       <SectionAnimation id="projects" animation="fade" className="bg-muted/50 py-24 relative overflow-hidden">
-        {/* Add the particle background */}
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
             colorScheme="teal"
@@ -296,7 +288,6 @@ export default function Home() {
             interactive={false}
           />
         </div>
-
         <div className="container relative z-10">
           <div className="flex flex-col items-center mb-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text-alt">Projects</h2>
@@ -304,7 +295,6 @@ export default function Home() {
               A selection of my recent projects in data science, machine learning, and cloud computing.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, index) => (
               <SectionAnimation key={project.title} animation="slide-up" delay={index * 0.1}>
@@ -361,9 +351,8 @@ export default function Home() {
         </div>
       </SectionAnimation>
 
-      {/* Skills Section - WITH PARTICLES */}
+      {/* Skills Section */}
       <SectionAnimation id="skills" animation="fade" className="py-24 relative overflow-hidden">
-        {/* Add the particle background */}
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
             colorScheme="default"
@@ -373,13 +362,11 @@ export default function Home() {
             interactive={false}
           />
         </div>
-
         <div className="container relative z-10">
           <div className="flex flex-col items-center mb-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text">Skills</h2>
             <p className="text-muted-foreground max-w-[700px]">My technical expertise and professional capabilities.</p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Object.entries(skills).map(([category, skillList], index) => (
               <SkillCardEnhanced key={category} category={category} skills={skillList} index={index} />
@@ -388,9 +375,8 @@ export default function Home() {
         </div>
       </SectionAnimation>
 
-      {/* Blog Section - WITH PARTICLES */}
+      {/* Blog Section */}
       <SectionAnimation id="blog" animation="fade" className="bg-muted/50 py-24 relative overflow-hidden">
-        {/* Add the particle background */}
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
             colorScheme="blue"
@@ -400,7 +386,6 @@ export default function Home() {
             interactive={false}
           />
         </div>
-
         <div className="container relative z-10">
           <div className="flex flex-col items-center mb-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text-alt">Blog</h2>
@@ -408,7 +393,6 @@ export default function Home() {
               Thoughts and insights on data science, AI, and technology.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogPosts.slice(0, 3).map((post, index) => (
               <SectionAnimation key={post.slug} animation="slide-up" delay={index * 0.1}>
@@ -445,7 +429,6 @@ export default function Home() {
               </SectionAnimation>
             ))}
           </div>
-
           <div className="flex justify-center mt-8">
             <Button asChild className="animated-underline">
               <Link href="/blog">
@@ -462,9 +445,7 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text">Gallery</h2>
           <p className="text-muted-foreground max-w-[700px]">Visual showcase of my projects and work.</p>
         </div>
-
         <GalleryGridEnhanced images={galleryImages.slice(0, 8)} />
-
         <div className="flex justify-center mt-8">
           <Button asChild className="animated-underline">
             <Link href="/gallery">
@@ -483,7 +464,6 @@ export default function Home() {
               If you are hiring, investing, or collaborating, I invite you to explore and connect.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             <SectionAnimation animation="slide-right" delay={0.2}>
               <div className="glass p-6 rounded-lg">

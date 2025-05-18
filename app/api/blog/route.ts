@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put, list, download } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 
 const BLOG_BLOB_KEY = "blog-posts.json";
 
+async function getBlogPostsFromBlob(token: string) {
+  const blobs = await list({ token });
+  const found = blobs.blobs.find(b => b.pathname === BLOG_BLOB_KEY);
+  if (!found) return [];
+  const res = await fetch(found.url);
+  return await res.json();
+}
+
 export async function GET() {
   try {
-    // Check if blob exists
-    const blobs = await list();
-    const found = blobs.blobs.find(b => b.pathname === BLOG_BLOB_KEY);
-
-    if (!found) return NextResponse.json([]);
-
-    // Download blob content
-    const res = await download(BLOG_BLOB_KEY, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const text = await res.text();
-    return NextResponse.json(JSON.parse(text));
-  } catch (e) {
-    return NextResponse.json({ error: "Failed to fetch blog posts." }, { status: 500 });
+    const posts = await getBlogPostsFromBlob(process.env.BLOB_READ_WRITE_TOKEN as string);
+    return NextResponse.json(posts);
+  } catch {
+    return NextResponse.json([], { status: 200 });
   }
 }
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       access: "public"
     });
     return NextResponse.json({ status: "ok" });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Failed to save blog posts." }, { status: 500 });
   }
 }

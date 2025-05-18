@@ -1,20 +1,20 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import EnhancedThreeScene from "@/components/enhanced-three-scene"
-import VisitorCounterEnhanced from "@/components/visitor-counter-enhanced"
-import ContactForm from "@/components/contact-form"
-import { getAllSkills } from "@/lib/skills"
-import { getAllBlogPosts } from "@/lib/blog-posts"
-import { getAllExperiences } from "@/lib/experiences"
-import { getAllProjects } from "@/lib/projects"
-import { galleryImages } from "@/lib/gallery-images"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import SectionAnimation from "@/components/section-animation"
-import ExperienceCardEnhanced from "@/components/experience-card-enhanced"
-import SkillCardEnhanced from "@/components/skill-card-enhanced"
-import GalleryGridEnhanced from "@/components/gallery-grid-enhanced"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import EnhancedThreeScene from "@/components/enhanced-three-scene";
+import VisitorCounterEnhanced from "@/components/visitor-counter-enhanced";
+import ContactForm from "@/components/contact-form";
+import { getAllSkills } from "@/lib/skills";
+import { getAllBlogPosts } from "@/lib/blog-posts";
+import { getAllExperiences } from "@/lib/experiences";
+import { getAllProjects } from "@/lib/projects";
+import { galleryImages } from "@/lib/gallery-images";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import SectionAnimation from "@/components/section-animation";
+import ExperienceCardEnhanced from "@/components/experience-card-enhanced";
+import SkillCardEnhanced from "@/components/skill-card-enhanced";
+import GalleryGridEnhanced from "@/components/gallery-grid-enhanced";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const metadata = {
   title: "Harsh Mehta | Data Scientist & Founder",
@@ -42,14 +42,14 @@ export const metadata = {
       "Founder & data scientist turning raw data into packed venues. Building Ensemble, the AI-agent booking engine. Business-intelligence analyst by trade, AI strategist by obsession.",
     images: ["/og-image.jpg"],
   },
-}
+};
 
 export default async function Home() {
   // Fetch all dynamic data from Blob Storage JSONs
-  const projects = await getAllProjects()
-  const blogPosts = await getAllBlogPosts()
-  const experiences = await getAllExperiences()
-  const skills = await getAllSkills()
+  const projects = await getAllProjects();
+  const blogPosts = await getAllBlogPosts();
+  const experiences = await getAllExperiences();  // <-- Now from blob
+  const skills = await getAllSkills();
 
   return (
     <div className="flex flex-col min-h-screen">

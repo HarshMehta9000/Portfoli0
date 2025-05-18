@@ -34,7 +34,7 @@ const mockData: ContentItem[] = [
     title: "Harsh Mehta",
     subtitle: "Founder & data scientist turning raw data into packed venues.",
     body:
-      "Building Ensemble, the AI-agent booking engine. Business, Intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live audio engineer, cinephile, spiritually Sanatan Hindu and history buff, INTP hoarding datasets on a self-built NAS while tinkering with MCP and next-gen agents. If it sounds niche or scaleless — I’m in.",
+      "Building Ensemble, the AI-agent booking engine. Business, Intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live&studio audio engineer, cinephile, seeker, problem solver, spiritual, Escapes into reading, try to write sometimes, history buff, INTP hoarding datasets on a self-built NAS while tinkering with MCP and next-gen agents. If it sounds niche or scaleless — I’m in.",
     media: "/hero.png",
     tags: ["AI", "Agent-based Architecture", "Strategy"]
   },

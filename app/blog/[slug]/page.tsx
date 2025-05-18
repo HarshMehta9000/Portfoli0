@@ -3,29 +3,27 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Calendar, Tag, Clock, Share2, Bookmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { blogPosts } from "@/lib/blog-posts"
+import { getAllBlogPosts } from "@/lib/blog-posts"
 import SectionAnimation from "@/components/section-animation"
 import { Badge } from "@/components/ui/badge"
 
 interface BlogPostPageProps {
-  params: {
-    slug: string
-  }
+  params: { slug: string }
 }
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
+  const posts = await getAllBlogPosts()
+  return posts.map((post) => ({
     slug: post.slug,
   }))
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = blogPosts.find((post) => post.slug === params.slug)
+  const posts = await getAllBlogPosts()
+  const post = posts.find((post) => post.slug === params.slug)
 
   if (!post) {
-    return {
-      title: "Post Not Found",
-    }
+    return { title: "Post Not Found" }
   }
 
   return {
@@ -54,8 +52,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = blogPosts.find((post) => post.slug === params.slug)
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const posts = await getAllBlogPosts()
+  const post = posts.find((post) => post.slug === params.slug)
 
   if (!post) {
     notFound()
@@ -131,7 +130,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         <SectionAnimation animation="fade" delay={0.8} className="border-t mt-12 pt-8">
           <h3 className="text-xl font-bold mb-4">Continue Reading</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {blogPosts
+            {posts
               .filter((p) => p.slug !== post.slug)
               .slice(0, 2)
               .map((relatedPost, index) => (

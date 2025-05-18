@@ -3,9 +3,10 @@ import { ArrowRight } from "lucide-react"
 import EnhancedThreeScene from "@/components/enhanced-three-scene"
 import VisitorCounterEnhanced from "@/components/visitor-counter-enhanced"
 import ContactForm from "@/components/contact-form"
-import { skills } from "@/lib/skills"
+import { getAllSkills } from "@/lib/skills"
 import { getAllBlogPosts } from "@/lib/blog-posts"
-import { experiences } from "@/lib/experiences"
+import { getAllExperiences } from "@/lib/experiences"
+import { getAllProjects } from "@/lib/projects"
 import { galleryImages } from "@/lib/gallery-images"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,7 +25,7 @@ export const metadata = {
     description:
       "Founder & data scientist turning raw data into packed venues. Building Ensemble, the AI-agent booking engine. Business-intelligence analyst by trade, AI strategist by obsession.",
     type: "website",
-    url: "https://harshmehta.dev",
+    url: "https://harshmehta.co",
     images: [
       {
         url: "/og-image.jpg",
@@ -43,68 +44,12 @@ export const metadata = {
   },
 }
 
-const projects = [
-  {
-    title: "UW Transportation Services Campus Parking Efficiency Project",
-    description:
-      "Analyzed 11M+ parking transaction records using Python, SQL, and Snowflake to uncover usage patterns and weather impacts.",
-    image: "/abstract-data-flow.png",
-    tags: ["Python", "SQL", "Snowflake", "Tableau", "Power BI"],
-    github: "https://github.com/HarshMehta9000/LIS620Parking",
-    details:
-      "Developed predictive models and interactive dashboards (Tableau/Power BI) that cut average parking search time by 27% and improved resource allocation. This project involved analyzing over 11 million parking transaction records to identify patterns and optimize resource allocation.",
-  },
-  {
-    title: "MSBA Financial Group Cloud-Native Data Architecture Project",
-    description: "Designed an end to end AWS data pipeline (S3, Glue, Redshift).",
-    image: "/cloud-native-connected-data.png",
-    tags: ["AWS", "S3", "Glue", "Redshift", "SageMaker"],
-    details:
-      "Deployed an ML model via SageMaker Canvas (99.19% accuracy) for bankruptcy risk prediction, informing investment strategies and cutting data processing time by 63%. The architecture allowed for the processing and analysis of large volumes of financial data, enabling more accurate risk assessment and investment decisions.",
-  },
-  {
-    title: "Hard Drive Data Extraction Tool",
-    description:
-      "Developed a user friendly tool (Python, JS, PostgreSQL) to extract hard drive data to JSON, standardizing output for analytics.",
-    image: "/data-insights-overview.png",
-    tags: ["Python", "JavaScript", "PostgreSQL", "JSON"],
-    demo: "https://melodic-kringle-9b3415.netlify.app/",
-    details:
-      "Reduced processing time by 60% and significantly cut computing/cloud costs. The tool extracts hard drive data to JSON, standardizing output for analytics and making it easier to process and analyze large volumes of data.",
-  },
-  {
-    title: "Research: Job Posting Analytics on Twitter",
-    description:
-      "Co authoring research analyzing 100k+ Twitter job postings using data mining and NLP to uncover hiring trends for peer reviewed publication.",
-    image: "/text-analysis-insights.png",
-    tags: ["NLP", "Data Mining", "Twitter API", "Research"],
-    demo: "https://docs.google.com/document/d/1dZR5oPDQ_W768aWHTl-36N0I0TuC41oIPV4Xl22kiD8/edit?tab=t.jemhm1prcbcn",
-    details:
-      "This research project involves analyzing over 100,000 Twitter job postings using data mining and NLP techniques to uncover hiring trends. The findings will be published in a peer-reviewed journal, contributing to our understanding of the job market and hiring practices.",
-  },
-  {
-    title: "Creative Application: MIDI to CSV Data Tool",
-    description:
-      "Created a Python tool to transform MIDI music files into analytical CSV datasets, capturing musical structures for analysis in a creative domain.",
-    image: "/sonic-spectrum.png",
-    tags: ["Python", "MIDI", "Data Transformation", "Music Analysis"],
-    details:
-      "This tool transforms MIDI music files into analytical CSV datasets, capturing musical structures like notes, rhythms, harmonies, and dynamics for analysis. It allows for the visualization of patterns in different musical genres, composers' styles, and individual pieces.",
-  },
-  {
-    title: "Graduate Studies: Learnings & Reflections",
-    description:
-      "Overview of key concepts, skills, and insights gained during the M.S. in Information program at UW Madison.",
-    image: "/collaborative-data-insights.png",
-    tags: ["Data Analytics", "Machine Learning", "Cloud Computing"],
-    demo: "https://gentle-sorbet-624f58.netlify.app/",
-    details:
-      "This project provides an overview of the key concepts, skills, and insights gained during the M.S. in Information program at UW Madison, focusing on Data Analytics, Machine Learning, and Cloud Computing. It serves as a reflection on the learning journey and a showcase of the knowledge acquired.",
-  },
-]
-
 export default async function Home() {
+  // Fetch all dynamic data from Blob Storage JSONs
+  const projects = await getAllProjects()
   const blogPosts = await getAllBlogPosts()
+  const experiences = await getAllExperiences()
+  const skills = await getAllSkills()
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -119,7 +64,7 @@ export default async function Home() {
             <p className="max-w-[700px] text-lg md:text-xl text-muted-foreground mb-8">
               Founder & data scientist turning raw data into packed venues. Building Ensemble, the AI-agent booking
               engine. Business-intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live audio
-              engineer, cinephile, spiritually Sanatani Hindu and history buff. INTP hoarding datasets on a self-built
+              engineer, cinephile, spiritual, history buff. INTP. hoarding datasets on a self-built
               NAS while tinkering with MCP and next-gen agents. If it sounds, stores, or scales, I'm in.
             </p>
           </SectionAnimation>

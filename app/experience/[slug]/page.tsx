@@ -1,40 +1,44 @@
-import type { Metadata } from "next"
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { ArrowLeft, ExternalLink, Calendar, Tag, MapPin } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { experiences } from "@/lib/experiences"
-import SectionAnimation from "@/components/section-animation"
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Calendar,
+  Tag,
+  MapPin,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { experiences } from "@/lib/experiences";
+import SectionAnimation from "@/components/section-animation";
 
 interface ExperiencePageProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
 }
 
 export async function generateStaticParams() {
-  return experiences.map((experience) => ({
-    slug: experience.slug,
-  }))
+  return experiences.map((experience) => ({ slug: experience.slug }));
 }
 
-export async function generateMetadata({ params }: ExperiencePageProps): Promise<Metadata> {
-  const experience = experiences.find((exp) => exp.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: ExperiencePageProps): Promise<Metadata> {
+  const experience = experiences.find((exp) => exp.slug === params.slug);
+  if (!experience) return { title: "Experience Not Found" };
 
-  if (!experience) {
-    return {
-      title: "Experience Not Found",
-    }
-  }
-
-  return {
+  const base = {
     title: `${experience.title} | Portfolio`,
     description: experience.description,
+  } as const;
+
+  return {
+    ...base,
     openGraph: {
-      title: `${experience.title} | Portfolio`,
-      description: experience.description,
+      ...base,
       type: "article",
       url: `https://portfolio.dev/experience/${experience.slug}`,
       images: [
@@ -48,27 +52,32 @@ export async function generateMetadata({ params }: ExperiencePageProps): Promise
     },
     twitter: {
       card: "summary_large_image",
-      title: `${experience.title} | Portfolio`,
-      description: experience.description,
+      ...base,
       images: [experience.coverImage],
     },
-  }
+  };
 }
 
 export default function ExperiencePage({ params }: ExperiencePageProps) {
-  const experience = experiences.find((exp) => exp.slug === params.slug)
+  const experience = experiences.find((exp) => exp.slug === params.slug);
+  if (!experience) notFound();
 
-  if (!experience) {
-    notFound()
-  }
+  const images = experience.images ?? [];
+  const techs = experience.technologies ?? [];
+  const links = experience.links ?? [];
+
+  const currentIndex = experiences.findIndex((e) => e.slug === params.slug);
+  const nextSlug = experiences[(currentIndex + 1) % experiences.length]?.slug;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
+      {/* Cover */}
       <section className="relative h-[50vh] w-full overflow-hidden">
         <Image
-          src={experience.coverImage || "/placeholder.svg"}
+          src={experience.coverImage ?? "/placeholder.svg"}
           alt={experience.title}
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -76,10 +85,12 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
         <div className="absolute inset-0 flex items-end">
           <div className="container pb-8">
             <SectionAnimation animation="slide-up" delay={0.2}>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4 gradient-text">{experience.title}</h1>
+              <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl gradient-text">
+                {experience.title}
+              </h1>
             </SectionAnimation>
             <SectionAnimation animation="slide-up" delay={0.3}>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="mb-4 flex flex-wrap gap-2">
                 {experience.tags.map((tag) => (
                   <Badge key={tag} variant="secondary">
                     {tag}
@@ -91,11 +102,19 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
         </div>
       </section>
 
+      {/* Body */}
       <section className="container py-12">
-        <div className="flex flex-col md:flex-row gap-12">
-          <SectionAnimation animation="slide-right" delay={0.4} className="md:w-2/3">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <p className="text-xl text-muted-foreground mb-8">{experience.description}</p>
+        <div className="flex flex-col gap-12 md:flex-row">
+          {/* Content */}
+          <SectionAnimation
+            animation="slide-right"
+            delay={0.4}
+            className="md:w-2/3"
+          >
+            <div className="prose prose-lg max-w-none dark:prose-invert">
+              <p className="mb-8 text-xl text-muted-foreground">
+                {experience.description}
+              </p>
 
               <h2>Overview</h2>
               <p>{experience.content.overview}</p>
@@ -109,28 +128,32 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
               <h2>My Thoughts</h2>
               <p>{experience.content.thoughts}</p>
 
-              {experience.content.achievements && (
+              {!!experience.content.achievements?.length && (
                 <>
                   <h2>Key Achievements</h2>
                   <ul>
-                    {experience.content.achievements.map((achievement, index) => (
-                      <li key={index}>{achievement}</li>
+                    {experience.content.achievements.map((ach, i) => (
+                      <li key={i}>{ach}</li>
                     ))}
                   </ul>
                 </>
               )}
             </div>
 
-            {experience.images.length > 0 && (
+            {!!images.length && (
               <SectionAnimation animation="fade" delay={0.6} className="mt-12">
-                <h2 className="text-2xl font-bold mb-6">Project Gallery</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {experience.images.map((image, index) => (
-                    <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
+                <h2 className="mb-6 text-2xl font-bold">Project Gallery</h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {images.map((img, i) => (
+                    <div
+                      key={i}
+                      className="relative aspect-video overflow-hidden rounded-lg"
+                    >
                       <Image
-                        src={image || "/placeholder.svg"}
-                        alt={`${experience.title} - Image ${index + 1}`}
+                        src={img ?? "/placeholder.svg"}
+                        alt={`${experience.title} – Image ${i + 1}`}
                         fill
+                        sizes="50vw"
                         className="object-cover transition-transform duration-500 hover:scale-105"
                       />
                     </div>
@@ -140,13 +163,17 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
             )}
           </SectionAnimation>
 
-          <SectionAnimation animation="slide-up" delay={0.5} className="md:w-1/3">
-            <div className="bg-muted rounded-lg p-6 sticky top-20">
-              <h3 className="text-xl font-bold mb-4">Project Details</h3>
-
+          {/* Sidebar */}
+          <SectionAnimation
+            animation="slide-up"
+            delay={0.5}
+            className="md:w-1/3"
+          >
+            <div className="sticky top-20 rounded-lg bg-muted p-6">
+              <h3 className="mb-4 text-xl font-bold">Project Details</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-2">
-                  <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                  <Calendar className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">Date</p>
                     <p className="text-muted-foreground">{experience.date}</p>
@@ -155,7 +182,7 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
 
                 {experience.location && (
                   <div className="flex items-start gap-2">
-                    <MapPin className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                    <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Location</p>
                       <p className="text-muted-foreground">{experience.location}</p>
@@ -164,12 +191,16 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
                 )}
 
                 <div className="flex items-start gap-2">
-                  <Tag className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                  <Tag className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">Technologies</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {experience.technologies.map((tech) => (
-                        <Badge key={tech} variant="outline" className="text-xs">
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {techs.map((tech) => (
+                        <Badge
+                          key={tech}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {tech}
                         </Badge>
                       ))}
@@ -177,21 +208,21 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
                   </div>
                 </div>
 
-                {experience.links && (
+                {!!links.length && (
                   <div className="flex items-start gap-2">
-                    <ExternalLink className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                    <ExternalLink className="mt-0.5 h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Links</p>
-                      <div className="space-y-1 mt-1">
-                        {experience.links.map((link, index) => (
+                      <div className="mt-1 space-y-1">
+                        {links.map((l, i) => (
                           <a
-                            key={index}
-                            href={link.url}
+                            key={i}
+                            href={l.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="block text-sm text-blue-500 hover:underline"
                           >
-                            {link.title}
+                            {l.title}
                           </a>
                         ))}
                       </div>
@@ -200,41 +231,38 @@ export default function ExperiencePage({ params }: ExperiencePageProps) {
                 )}
               </div>
 
-              <div className="mt-8">
-                <Button asChild className="w-full">
-                  <Link href={experience.links?.[0]?.url || "#"} target="_blank" rel="noopener noreferrer">
+              {!!links.length && (
+                <Button asChild className="mt-8 w-full">
+                  <Link
+                    href={links[0].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     View Live Project <ExternalLink className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-              </div>
+              )}
             </div>
           </SectionAnimation>
         </div>
       </section>
 
-      <section className="container py-12 border-t">
-        <div className="flex justify-between items-center">
+      {/* Footer nav */}
+      <section className="container border-t py-12">
+        <div className="flex items-center justify-between">
           <Button variant="outline" asChild>
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
             </Link>
           </Button>
 
-          <div className="flex gap-2">
-            {experiences.length > 1 && (
-              <Button variant="outline" asChild>
-                <Link
-                  href={`/experience/${
-                    experiences[(experiences.findIndex((e) => e.slug === params.slug) + 1) % experiences.length].slug
-                  }`}
-                >
-                  Next Project
-                </Link>
-              </Button>
-            )}
-          </div>
+          {experiences.length > 1 && nextSlug && (
+            <Button variant="outline" asChild>
+              <Link href={`/experience/${nextSlug}`}>Next Project</Link>
+            </Button>
+          )}
         </div>
       </section>
     </div>
-  )
+  );
 }

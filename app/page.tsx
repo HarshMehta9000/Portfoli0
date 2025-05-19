@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import EnhancedThreeScene from "@/components/enhanced-three-scene";
 import VisitorCounterEnhanced from "@/components/visitor-counter-enhanced";
 import ContactForm from "@/components/contact-form";
-import { getAllSkills } from "@/lib/skills";
+// import { getAllSkills } from "@/lib/skills"; // Temporarily disabled due to export error from lib/skills
 import { getAllBlogPosts } from "@/lib/blog-posts";
 import { getAllExperiences } from "@/lib/experiences";
 import { getAllProjects } from "@/lib/projects";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SectionAnimation from "@/components/section-animation";
 import ExperienceCardEnhanced from "@/components/experience-card-enhanced";
-import SkillCardEnhanced from "@/components/skill-card-enhanced";
+// import SkillCardEnhanced from "@/components/skill-card-enhanced"; // Temporarily disable if Skills section is out
 import GalleryGridEnhanced from "@/components/gallery-grid-enhanced";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -49,14 +49,14 @@ export default async function Home() {
   let projects = [];
   let blogPosts = [];
   let experiences = [];
-  let skills = {}; // Skills is an object where keys are categories and values are arrays of skills
+  // let skills = {}; // Temporarily disabled
 
   try {
     const fetchedProjects = await getAllProjects();
     projects = Array.isArray(fetchedProjects) ? fetchedProjects : [];
   } catch (error) {
     console.error("Failed to fetch projects:", error);
-    projects = []; // Ensure projects is an array
+    projects = [];
   }
 
   try {
@@ -64,7 +64,7 @@ export default async function Home() {
     blogPosts = Array.isArray(fetchedBlogPosts) ? fetchedBlogPosts : [];
   } catch (error) {
     console.error("Failed to fetch blog posts:", error);
-    blogPosts = []; // Ensure blogPosts is an array
+    blogPosts = [];
   }
 
   try {
@@ -72,31 +72,39 @@ export default async function Home() {
     experiences = Array.isArray(fetchedExperiences) ? fetchedExperiences : [];
   } catch (error) {
     console.error("Failed to fetch experiences:", error);
-    experiences = []; // Ensure experiences is an array
+    experiences = [];
   }
+
+  /*
+  // Temporarily disable skills fetching due to export error in lib/skills.ts
+  // To re-enable:
+  // 1. Ensure `lib/skills.ts` exports `getAllSkills` (e.g., `export async function getAllSkills() {...}`).
+  // 2. Uncomment the import for `getAllSkills` at the top of this file.
+  // 3. Uncomment this try-catch block.
+  // 4. Uncomment the "Skills Section" JSX below.
+  // 5. Uncomment the import for `SkillCardEnhanced` if used.
 
   try {
     const fetchedSkills = await getAllSkills();
-    // Ensure fetchedSkills is an object; otherwise, default to an empty object.
-    // Also, ensure each skill list under a category is an array.
     if (fetchedSkills && typeof fetchedSkills === 'object' && !Array.isArray(fetchedSkills)) {
         skills = fetchedSkills;
         for (const category in skills) {
             if (Object.hasOwnProperty.call(skills, category) && !Array.isArray(skills[category])) {
                 console.warn(`Skills for category '${category}' is not an array, defaulting to empty array.`);
-                skills[category] = []; // Ensure each skill list is an array
+                skills[category] = [];
             }
         }
     } else {
-        if (fetchedSkills !== null && fetchedSkills !== undefined) { // only log if it was not a clean null/undefined
+        if (fetchedSkills !== null && fetchedSkills !== undefined) {
              console.warn("getAllSkills did not return a valid object, defaulting to empty skills object.");
         }
         skills = {};
     }
   } catch (error) {
     console.error("Failed to fetch skills:", error);
-    skills = {}; // Ensure skills is an object
+    skills = {};
   }
+  */
 
 
   return (
@@ -111,9 +119,8 @@ export default async function Home() {
           <SectionAnimation animation="slide-up" delay={0.4}>
             <p className="max-w-[700px] text-lg md:text-xl text-muted-foreground mb-8">
               Founder & data scientist turning raw data into packed venues. Building Ensemble, the AI-agent booking
-              engine. Business-intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live audio
-              engineer, cinephile, spiritual, history buff. INTP. hoarding datasets on a self-built
-              NAS while tinkering with MCP and next-gen agents. If it sounds, stores, or scales, I'm in.
+              engine. Business-intelligence analyst by trade, AI strategist by obsession. Music connoisseur, live & studio audio
+              engineer, cinephile, history buff. INTP. Learning to build a homegrown NAS LLM, I wield MCP, LangChain, and agentic RAG to surface code, files, and insight on demand.
             </p>
           </SectionAnimation>
           <SectionAnimation animation="slide-up" delay={0.6}>
@@ -297,7 +304,7 @@ export default async function Home() {
                       src={project.image || "/placeholder.svg"}
                       alt={project.title || "Project image"}
                       className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
-                    /> {/* FIXED: Self-closing img tag */}
+                    /> {/* Fixed: Self-closing img tag */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                       <div className="flex gap-2">
                         {project.tags && Array.isArray(project.tags) && project.tags.slice(0, 3).map((tag, tagIndex) => (
@@ -344,7 +351,10 @@ export default async function Home() {
         </div>
       </SectionAnimation>
 
-      {/* Skills Section */}
+      {/*
+      // Temporarily disable Skills Section due to build error with getAllSkills import
+      // To re-enable, ensure `lib/skills.ts` correctly exports `getAllSkills` and
+      // uncomment the relevant imports and data fetching logic for `skills`.
       <SectionAnimation id="skills" animation="fade" className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 -z-0 opacity-40">
           <EnhancedThreeScene
@@ -362,15 +372,15 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Object.entries(skills).map(([category, skillList], index) => {
-              // Ensure skillList is an array before passing to SkillCardEnhanced
               if (Array.isArray(skillList)) {
                 return <SkillCardEnhanced key={category || `skill-cat-${index}`} category={category} skills={skillList} index={index} />;
               }
-              return null; // Or some placeholder if skillList is not an array for a category
+              return null;
             })}
           </div>
         </div>
       </SectionAnimation>
+      */}
 
       {/* Blog Section */}
       <SectionAnimation id="blog" animation="fade" className="bg-muted/50 py-24 relative overflow-hidden">
@@ -400,7 +410,7 @@ export default async function Home() {
                         src={post.coverImage || "/placeholder.svg"}
                         alt={post.title || "Blog post image"}
                         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                      /> {/* FIXED: Self-closing img tag */}
+                      /> {/* Fixed: Self-closing img tag */}
                       <div className="absolute top-2 right-2">
                         <Badge variant="secondary" className="font-normal text-xs">
                           {post.readingTime} min read
@@ -442,11 +452,6 @@ export default async function Home() {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text">Gallery</h2>
           <p className="text-muted-foreground max-w-[700px]">Visual showcase of my projects and work.</p>
         </div>
-        {/* Assuming galleryImages is an array of objects with src, alt, etc.
-            If galleryImages itself can be undefined/null, add a check or ensure it defaults to []
-            Example: const galleryImages = (await getGalleryImages()) || [];
-            But here it's imported directly, so it should be an array.
-        */}
         {Array.isArray(galleryImages) && <GalleryGridEnhanced images={galleryImages.slice(0, 8)} /> }
         <div className="flex justify-center mt-8">
           <Button asChild className="animated-underline">

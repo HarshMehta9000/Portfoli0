@@ -45,11 +45,59 @@ export const metadata = {
 };
 
 export default async function Home() {
-  // Fetch all dynamic data from Blob Storage JSONs
-  const projects = await getAllProjects();
-  const blogPosts = await getAllBlogPosts();
-  const experiences = await getAllExperiences();  // <-- Now from blob
-  const skills = await getAllSkills();
+  // Fetch all dynamic data with error handling and fallbacks
+  let projects = [];
+  let blogPosts = [];
+  let experiences = [];
+  let skills = {}; // Skills is an object where keys are categories and values are arrays of skills
+
+  try {
+    const fetchedProjects = await getAllProjects();
+    projects = Array.isArray(fetchedProjects) ? fetchedProjects : [];
+  } catch (error) {
+    console.error("Failed to fetch projects:", error);
+    projects = []; // Ensure projects is an array
+  }
+
+  try {
+    const fetchedBlogPosts = await getAllBlogPosts();
+    blogPosts = Array.isArray(fetchedBlogPosts) ? fetchedBlogPosts : [];
+  } catch (error) {
+    console.error("Failed to fetch blog posts:", error);
+    blogPosts = []; // Ensure blogPosts is an array
+  }
+
+  try {
+    const fetchedExperiences = await getAllExperiences();
+    experiences = Array.isArray(fetchedExperiences) ? fetchedExperiences : [];
+  } catch (error) {
+    console.error("Failed to fetch experiences:", error);
+    experiences = []; // Ensure experiences is an array
+  }
+
+  try {
+    const fetchedSkills = await getAllSkills();
+    // Ensure fetchedSkills is an object; otherwise, default to an empty object.
+    // Also, ensure each skill list under a category is an array.
+    if (fetchedSkills && typeof fetchedSkills === 'object' && !Array.isArray(fetchedSkills)) {
+        skills = fetchedSkills;
+        for (const category in skills) {
+            if (Object.hasOwnProperty.call(skills, category) && !Array.isArray(skills[category])) {
+                console.warn(`Skills for category '${category}' is not an array, defaulting to empty array.`);
+                skills[category] = []; // Ensure each skill list is an array
+            }
+        }
+    } else {
+        if (fetchedSkills !== null && fetchedSkills !== undefined) { // only log if it was not a clean null/undefined
+             console.warn("getAllSkills did not return a valid object, defaulting to empty skills object.");
+        }
+        skills = {};
+    }
+  } catch (error) {
+    console.error("Failed to fetch skills:", error);
+    skills = {}; // Ensure skills is an object
+  }
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -186,14 +234,14 @@ export default async function Home() {
             <TabsContent value="cards" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {experiences.slice(0, 6).map((experience, index) => (
-                  <ExperienceCardEnhanced key={experience.slug} experience={experience} index={index} />
+                  <ExperienceCardEnhanced key={experience.slug || `exp-card-${index}`} experience={experience} index={index} />
                 ))}
               </div>
             </TabsContent>
             <TabsContent value="timeline" className="mt-6">
               <div className="relative border-l-2 border-muted ml-4 md:ml-6 pl-6 md:pl-8 space-y-10">
                 {experiences.slice(0, 6).map((experience, index) => (
-                  <SectionAnimation key={experience.slug} animation="slide-up" delay={index * 0.1} className="relative">
+                  <SectionAnimation key={experience.slug || `exp-timeline-${index}`} animation="slide-up" delay={index * 0.1} className="relative">
                     <div className="absolute w-4 h-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full -left-[34px] md:-left-[42px] top-1"></div>
                     <div className="card-hover p-6 border rounded-lg">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
@@ -202,8 +250,8 @@ export default async function Home() {
                       </div>
                       <p className="text-muted-foreground mb-4">{experience.description}</p>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {experience.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="font-normal">
+                        {experience.tags && Array.isArray(experience.tags) && experience.tags.map((tag, tagIndex) => (
+                          <Badge key={`exp-${index}-tag-${tagIndex}-${tag}`} variant="secondary" className="font-normal">
                             {tag}
                           </Badge>
                         ))}
@@ -242,18 +290,18 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, index) => (
-              <SectionAnimation key={project.title} animation="slide-up" delay={index * 0.1}>
+              <SectionAnimation key={project.slug || project.id || project.title || `proj-${index}`} animation="slide-up" delay={index * 0.1}>
                 <div className="border rounded-lg overflow-hidden bg-background card-hover h-full flex flex-col">
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={project.image || "/placeholder.svg"}
-                      alt={project.title}
+                      alt={project.title || "Project image"}
                       className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
-                    />
+                    /> {/* FIXED: Self-closing img tag */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                       <div className="flex gap-2">
-                        {project.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="font-normal">
+                        {project.tags && Array.isArray(project.tags) && project.tags.slice(0, 3).map((tag, tagIndex) => (
+                          <Badge key={`proj-${index}-hero-tag-${tagIndex}-${tag}`} variant="secondary" className="font-normal">
                             {tag}
                           </Badge>
                         ))}
@@ -264,8 +312,8 @@ export default async function Home() {
                     <h3 className="text-xl font-bold mb-2">{project.title}</h3>
                     <p className="text-muted-foreground mb-4 line-clamp-3">{project.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {project.tags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="font-normal text-xs">
+                       {project.tags && Array.isArray(project.tags) && project.tags.map((tag, tagIndex) => (
+                        <Badge key={`proj-${index}-detail-tag-${tagIndex}-${tag}`} variant="outline" className="font-normal text-xs">
                           {tag}
                         </Badge>
                       ))}
@@ -313,9 +361,13 @@ export default async function Home() {
             <p className="text-muted-foreground max-w-[700px]">My technical expertise and professional capabilities.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(skills).map(([category, skillList], index) => (
-              <SkillCardEnhanced key={category} category={category} skills={skillList} index={index} />
-            ))}
+            {Object.entries(skills).map(([category, skillList], index) => {
+              // Ensure skillList is an array before passing to SkillCardEnhanced
+              if (Array.isArray(skillList)) {
+                return <SkillCardEnhanced key={category || `skill-cat-${index}`} category={category} skills={skillList} index={index} />;
+              }
+              return null; // Or some placeholder if skillList is not an array for a category
+            })}
           </div>
         </div>
       </SectionAnimation>
@@ -340,15 +392,15 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogPosts.slice(0, 3).map((post, index) => (
-              <SectionAnimation key={post.slug} animation="slide-up" delay={index * 0.1}>
+              <SectionAnimation key={post.slug || `blog-post-${index}`} animation="slide-up" delay={index * 0.1}>
                 <Link href={`/blog/${post.slug}`} className="group h-full">
                   <div className="border rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-full flex flex-col bg-background">
                     <div className="aspect-video relative overflow-hidden">
                       <img
                         src={post.coverImage || "/placeholder.svg"}
-                        alt={post.title}
+                        alt={post.title || "Blog post image"}
                         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                      />
+                      /> {/* FIXED: Self-closing img tag */}
                       <div className="absolute top-2 right-2">
                         <Badge variant="secondary" className="font-normal text-xs">
                           {post.readingTime} min read
@@ -362,8 +414,8 @@ export default async function Home() {
                       </h3>
                       <p className="text-muted-foreground mb-4 flex-1">{post.excerpt}</p>
                       <div className="flex flex-wrap gap-2">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span key={tag} className="text-xs bg-muted px-2 py-1 rounded-full">
+                        {post.tags && Array.isArray(post.tags) && post.tags.slice(0, 3).map((tag, tagIndex) => (
+                          <span key={`blog-${index}-tag-${tagIndex}-${tag}`} className="text-xs bg-muted px-2 py-1 rounded-full">
                             {tag}
                           </span>
                         ))}
@@ -390,7 +442,12 @@ export default async function Home() {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4 gradient-text">Gallery</h2>
           <p className="text-muted-foreground max-w-[700px]">Visual showcase of my projects and work.</p>
         </div>
-        <GalleryGridEnhanced images={galleryImages.slice(0, 8)} />
+        {/* Assuming galleryImages is an array of objects with src, alt, etc.
+            If galleryImages itself can be undefined/null, add a check or ensure it defaults to []
+            Example: const galleryImages = (await getGalleryImages()) || [];
+            But here it's imported directly, so it should be an array.
+        */}
+        {Array.isArray(galleryImages) && <GalleryGridEnhanced images={galleryImages.slice(0, 8)} /> }
         <div className="flex justify-center mt-8">
           <Button asChild className="animated-underline">
             <Link href="/gallery">
@@ -423,11 +480,11 @@ export default async function Home() {
                       >
                         contact.harshmehta@gmail.com
                       </a>
-                      <a
-                        href="mailto:hershpmehta@gmail.com"
+                      <a // FIXED: Email typo
+                        href="mailto:harshpmehta@gmail.com"
                         className="text-blue-500 hover:underline block animated-underline"
                       >
-                        hershpmehta@gmail.com
+                        harshpmehta@gmail.com
                       </a>
                       <a
                         href="mailto:hmehta7@wisc.edu"
@@ -507,5 +564,5 @@ export default async function Home() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

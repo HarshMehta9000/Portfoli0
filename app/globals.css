@@ -1,0 +1,266 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply tracking-tight font-bold;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  section {
+    @apply py-16 md:py-24;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500;
+}
+
+.gradient-text-alt {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-teal-500 to-purple-500;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Section transitions */
+.section-animate {
+  @apply opacity-0 translate-y-8 transition-all duration-700;
+}
+
+.section-animate.animate-in {
+  @apply opacity-100 translate-y-0;
+}
+
+/* Animated background */
+.animated-bg {
+  background: linear-gradient(-45deg, #ff49db, #7928ca, #0070f3, #00ccaa);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Prose styles for markdown content */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  @apply font-bold tracking-tighter;
+}
+
+.prose h2 {
+  @apply text-2xl mt-8 mb-4;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose a {
+  @apply text-blue-500 hover:underline;
+}
+
+.prose ul,
+.prose ol {
+  @apply my-4 pl-6;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+/* Glass effect */
+.glass {
+  @apply bg-background/80 backdrop-blur-md border border-border/50;
+}
+
+/* Animated underline */
+.animated-underline {
+  position: relative;
+}
+
+.animated-underline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: linear-gradient(90deg, #ff49db, #7928ca);
+  transition: width 0.3s ease;
+}
+
+.animated-underline:hover::after {
+  width: 100%;
+}
+
+/* Floating animation */
+.floating {
+  animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Staggered animation for lists */
+.stagger-animate > * {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.stagger-animate > *:nth-child(1) {
+  animation: stagger-item 0.5s 0.1s forwards ease-out;
+}
+.stagger-animate > *:nth-child(2) {
+  animation: stagger-item 0.5s 0.2s forwards ease-out;
+}
+.stagger-animate > *:nth-child(3) {
+  animation: stagger-item 0.5s 0.3s forwards ease-out;
+}
+.stagger-animate > *:nth-child(4) {
+  animation: stagger-item 0.5s 0.4s forwards ease-out;
+}
+.stagger-animate > *:nth-child(5) {
+  animation: stagger-item 0.5s 0.5s forwards ease-out;
+}
+.stagger-animate > *:nth-child(6) {
+  animation: stagger-item 0.5s 0.6s forwards ease-out;
+}
+.stagger-animate > *:nth-child(7) {
+  animation: stagger-item 0.5s 0.7s forwards ease-out;
+}
+.stagger-animate > *:nth-child(8) {
+  animation: stagger-item 0.5s 0.8s forwards ease-out;
+}
+.stagger-animate > *:nth-child(9) {
+  animation: stagger-item 0.5s 0.9s forwards ease-out;
+}
+.stagger-animate > *:nth-child(10) {
+  animation: stagger-item 0.5s 1s forwards ease-out;
+}
+
+@keyframes stagger-item {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

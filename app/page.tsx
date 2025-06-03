@@ -250,7 +250,7 @@ export default function Home() {
       <p className="text-sm font-semibold mt-1">GPA: 3.5/4.0</p>
     </div>
     <Image
-      src="/logo/uomlogo.jpeg"
+      src="/logo/Uomlogo.jpg"
       alt="University of Mumbai logo"
       width={50}
       height={50}
